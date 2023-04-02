@@ -1,5 +1,5 @@
 import pygame as pg
-from molecules import benzene
+from molecules import benzene, methane
 
 # Need to magnify the coordinates when viewing...
 MAGNIFICATION = 100
@@ -23,8 +23,13 @@ def main():
 		screen.blit(bg, (0, 0))
 
 		# Drawing the molecule...
-		for atom in benzene:
-			pg.draw.circle(screen, (255,255,255), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 10)
+		for index, atom in enumerate(methane):
+			if index == 0:
+				pg.draw.circle(screen, (100,100,100), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 30)
+			else:
+				pg.draw.circle(screen, (255,255,255), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 10+7*atom[3])
+		# for atom in benzene:
+		# 	pg.draw.circle(screen, (255,255,255), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 10)
 		
 		pg.display.update()
 		clock.tick(60)
