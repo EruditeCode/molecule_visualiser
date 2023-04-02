@@ -1,8 +1,9 @@
 import pygame as pg
 from molecules import benzene, methane
+from class_Atom import Atom
 
 # Need to magnify the coordinates when viewing...
-MAGNIFICATION = 100
+MAG = 100
 
 def main():
 	pg.init()
@@ -13,6 +14,11 @@ def main():
 	bg = pg.Surface((WIDTH, HEIGHT))
 	bg = pg.transform.scale(bg, (WIDTH, HEIGHT))
 
+	# Load molecule using atom class.
+	molecule = []
+	for atom in benzene:
+		molecule.append(Atom(atom[0], atom[1]*MAG, atom[2]*MAG, atom[3]*MAG, atom[4]))
+
 	while True:
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -22,14 +28,14 @@ def main():
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
 
-		# Drawing the molecule...
-		for index, atom in enumerate(methane):
-			if index == 0:
-				pg.draw.circle(screen, (100,100,100), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 30)
-			else:
-				pg.draw.circle(screen, (255,255,255), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 10+7*atom[3])
-		# for atom in benzene:
-		# 	pg.draw.circle(screen, (255,255,255), (atom[1]*MAGNIFICATION+WIDTH//2,atom[2]*MAGNIFICATION+HEIGHT//2), 10)
+		# Drawing the molecule.
+		# Drawing bonds.
+		for atom in molecule:
+			for key in atom.bonds.keys():
+				pg.draw.line(screen, (255,255,255), (atom.x+WIDTH//2, atom.y+HEIGHT//2), (molecule[key-1].x+WIDTH//2, molecule[key-1].y+HEIGHT//2), 5)
+		# Drawing atoms.
+		for atom in molecule:
+			pg.draw.circle(screen, (255,255,255), (atom.x+WIDTH//2,atom.y+HEIGHT//2), 10)
 		
 		pg.display.update()
 		clock.tick(60)
