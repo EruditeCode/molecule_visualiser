@@ -21,35 +21,40 @@ def main():
 	for atom in benzene:
 		molecule.append(Atom(atom[0], atom[1]*MAG, atom[2]*MAG, atom[3]*MAG, atom[4]))
 
-	rotate = False
-	rotate_start = None
+	r_start = False
+	r_pos = None
+	r_end = False
 	while True:
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				pg.quit()
 				exit()
 			if event.type == pg.MOUSEBUTTONDOWN:
-				if event.button == 1 and not rotate_start:
-					rotate_start = pg.mouse.get_pos()
+				if event.button == 1 and not r_start:
+					r_start, r_pos = True, pg.mouse.get_pos()
 			if event.type == pg.MOUSEBUTTONUP:
-				if event.button == 1 and rotate_start:
-					rotate = True
+				if event.button == 1 and r_start:
+					r_end = True
 
 		# Update molecule position.
-		if rotate:
-			rotate_end = pg.mouse.get_pos()
-			dx = rotate_start[0]-rotate_end[0]
-			dy = rotate_start[1]-rotate_end[1]
+		if r_start:
+			temp_pos = pg.mouse.get_pos()
+			dx = r_pos[0]-temp_pos[0]
+			dy = r_pos[1]-temp_pos[1]
+			
 			angle = math.pi * (dy / HEIGHT)
 			for atom in molecule:
-				atom.vector = rotate_x(angle, atom.vector)
+				atom.vector = rotate_x(-angle, atom.fixed_vector)
+			
 			angle = math.pi * (dx / WIDTH)
 			for atom in molecule:
 				atom.vector = rotate_y(angle, atom.vector)
-
-			# Reset flags...
-			rotate = False
-			rotate_start = None
+			if r_end:
+				for atom in molecule:
+					atom.fixed_vector = atom.vector.copy()
+				# Reset flags...
+				r_start, r_end = False, False
+				r_pos = None
 
 
 		# Displaying the background surface.
