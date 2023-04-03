@@ -1,8 +1,9 @@
 import pygame as pg
 import math
 import numpy as np
-from molecules import benzene, methane
+from molecules import benzene, methane, covalent_radii, atom_color
 from class_Atom import Atom
+
 
 def main():
 	pg.init()
@@ -11,11 +12,11 @@ def main():
 	clock = pg.time.Clock()
 
 	bg = pg.Surface((WIDTH, HEIGHT))
-	bg = pg.transform.scale(bg, (WIDTH, HEIGHT))
+	bg.fill((20,20,20))
 
 	# Load molecule using atom class.
 	molecule = []
-	for atom in benzene:
+	for atom in methane:
 		molecule.append(Atom(atom[0], atom[1], atom[2], atom[3], atom[4]))
 
 	MAG = 100
@@ -57,6 +58,8 @@ def main():
 				r_pos = None
 
 
+		# Prior to displaying, order atoms in molecule by z-position.
+
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
 
@@ -73,7 +76,8 @@ def main():
 		for atom in molecule:
 			x = atom.vector[0].item(0)*MAG+WIDTH//2
 			y = atom.vector[0].item(1)*MAG+HEIGHT//2
-			pg.draw.circle(screen, (255,255,255), (x, y), 10)
+			radius = MAG//5+atom.vector[0].item(2)*MAG//20
+			pg.draw.circle(screen, (255,255,255), (x, y), radius) #12
 		
 		pg.display.update()
 		clock.tick(60)
