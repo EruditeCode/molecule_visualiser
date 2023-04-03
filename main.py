@@ -1,7 +1,7 @@
 import pygame as pg
 import math
 import numpy as np
-from molecules import benzene, methane, covalent_radii, atom_color
+from molecules import benzene, methane, paracetamol, covalent_radii, atom_color
 from class_Atom import Atom
 
 
@@ -16,7 +16,7 @@ def main():
 
 	# Load molecule using atom class.
 	molecule = []
-	for atom in methane:
+	for atom in paracetamol:
 		molecule.append(Atom(atom[0], atom[1], atom[2], atom[3], atom[4]))
 
 	for atom in molecule:
