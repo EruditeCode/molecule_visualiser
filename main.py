@@ -4,9 +4,6 @@ import numpy as np
 from molecules import benzene, methane
 from class_Atom import Atom
 
-# Need to magnify the coordinates when viewing...
-MAG = 100
-
 def main():
 	pg.init()
 	WIDTH, HEIGHT = 900, 600
@@ -19,8 +16,9 @@ def main():
 	# Load molecule using atom class.
 	molecule = []
 	for atom in benzene:
-		molecule.append(Atom(atom[0], atom[1]*MAG, atom[2]*MAG, atom[3]*MAG, atom[4]))
+		molecule.append(Atom(atom[0], atom[1], atom[2], atom[3], atom[4]))
 
+	MAG = 100
 	r_start = False
 	r_pos = None
 	r_end = False
@@ -35,6 +33,8 @@ def main():
 			if event.type == pg.MOUSEBUTTONUP:
 				if event.button == 1 and r_start:
 					r_end = True
+			if event.type == pg.MOUSEWHEEL:
+				MAG += event.y
 
 		# Update molecule position.
 		if r_start:
@@ -64,10 +64,16 @@ def main():
 		# Drawing bonds.
 		for atom in molecule:
 			for key in atom.bonds.keys():
-				pg.draw.line(screen, (255,255,255), (atom.vector[0].item(0)+WIDTH//2, atom.vector[0].item(1)+HEIGHT//2), (molecule[key-1].vector[0].item(0)+WIDTH//2, molecule[key-1].vector[0].item(1)+HEIGHT//2), 5)
+				x1 = atom.vector[0].item(0)*MAG+WIDTH//2
+				y1 = atom.vector[0].item(1)*MAG+HEIGHT//2
+				x2 = molecule[key-1].vector[0].item(0)*MAG+WIDTH//2
+				y2 = molecule[key-1].vector[0].item(1)*MAG+HEIGHT//2
+				pg.draw.line(screen, (255,255,255), (x1, y1), (x2, y2), 5)
 		# Drawing atoms.
 		for atom in molecule:
-			pg.draw.circle(screen, (255,255,255), (atom.vector[0].item(0)+WIDTH//2,atom.vector[0].item(1)+HEIGHT//2), 10)
+			x = atom.vector[0].item(0)*MAG+WIDTH//2
+			y = atom.vector[0].item(1)*MAG+HEIGHT//2
+			pg.draw.circle(screen, (255,255,255), (x, y), 10)
 		
 		pg.display.update()
 		clock.tick(60)
