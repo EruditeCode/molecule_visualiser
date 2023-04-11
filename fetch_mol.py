@@ -27,7 +27,6 @@ def check_local_database(mol_name):
 	with open('molecules.json', 'r') as f:
 		database = json.load(f)
 	if mol_name in database:
-		print("LOCAL")
 		return database[mol_name]
 
 def check_remote_database(mol_name):
