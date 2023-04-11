@@ -27,15 +27,13 @@ class Bond:
 
 class Molecule:
 	def __init__(self, molecule, name=None):
-		self.id = None
+		self.id = molecule['mol_id']
 		self.name = name if name else None
 		self.atoms = []
 		self.bonds = []
 		self.constructor(molecule)
 
 	def constructor(self, molecule):
-		# Log the id from source e.g. PubChem.
-		self.id = molecule['mol_id']
 		for atom in molecule['atoms']:
 			self.atoms.append(Atom(atom[0], atom[1], atom[2], atom[3], atom[4]))
 		for bond in molecule['bonds']:
@@ -59,9 +57,8 @@ class Molecule:
 class Molecule_Renderer:
 	"""
 		This class is responsible for all drawing action which
-		also involves handling flags e.g. show hydrogen atoms,
-		show bonds with free rotation, draw space filling model...
-		many more to add
+		also involves handling flags e.g. showing hydrogen atoms,
+		multiple bonds or bonds with free rotation.
 	"""
 	def __init__(self, molecule, screen, width, height):
 		self.molecule = molecule
@@ -75,25 +72,20 @@ class Molecule_Renderer:
 		self.show_free_rotation = False
 
 	def draw(self):
-		# Have to draw any bonds connected to an atom before drawing the atom.
 		if self.show_H:
 			available_bonds = self.molecule.bonds.copy()
-			for atom in self.molecule.atoms:
-				for i in range(len(available_bonds)-1, -1, -1):
-					if atom in available_bonds[i].atoms:
-						self.draw_bond(available_bonds[i])
-						available_bonds.pop(i)
-				self.draw_atom(atom)
+			available_atoms = self.molecule.atoms.copy()
 		else:
 			available_bonds = [bond for bond in self.molecule.bonds if bond.atoms[0].element != "H" and bond.atoms[1].element != "H"]
-			for atom in self.molecule.atoms:
-				if atom.element != "H":
-					for i in range(len(available_bonds)-1, -1, -1):
-						if atom in available_bonds[i].atoms:
-							self.draw_bond(available_bonds[i])
-							available_bonds.pop(i)
-					self.draw_atom(atom)
-
+			available_atoms = [atom for atom in self.molecule.atoms if atom.element != "H"]
+		
+		for atom in available_atoms:
+			for i in range(len(available_bonds)-1, -1, -1):
+				if atom in available_bonds[i].atoms:
+					self.draw_bond(available_bonds[i])
+					available_bonds.pop(i)
+			self.draw_atom(atom)
+		
 	def draw_bond(self, bond):
 		x1 = bond.atoms[0].vector[0,0]*self.mag+self.center[0]
 		y1 = bond.atoms[0].vector[0,1]*self.mag+self.center[1]
