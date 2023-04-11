@@ -1,14 +1,13 @@
 import pygame as pg
 import math
-import numpy as np
 from geometric_functions import rotate_y, rotate_x, recenter_molecule
 from support_classes import Molecule, Molecule_Renderer
-from support_functions import get_molecule
+from fetch_mol import fetch_mol
 
 
 def main():
 	# Use terminal interface to make data request before creating visualisation window.
-	molecule_data = get_molecule()
+	molecule_data = fetch_mol()
 	
 	pg.init()
 	WIDTH, HEIGHT = 900, 600
@@ -70,14 +69,11 @@ def main():
 				r_start, r_end = False, False
 				r_pos = None
 
-
-		# Update molecule position, orientation etc.
-		molecule.reorder_atoms()
-
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
 
-		# Drawing the molecule using the molecule renderer.
+		# Reorder atoms and drawing the molecule.
+		molecule.reorder_atoms()
 		molecule_renderer.draw()
 		
 		pg.display.update()
