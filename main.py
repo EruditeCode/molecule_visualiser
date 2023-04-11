@@ -3,7 +3,6 @@ import math
 import numpy as np
 from molecules import methane, benzene, paracetamol, penicillin, azulene
 from geometric_functions import rotate_y, rotate_x, recenter_molecule
-from atom_properties import covalent_radii, atom_color
 from support_classes import Molecule
 
 
@@ -18,6 +17,7 @@ def main():
 
 	# Load molecule using molecule class.
 	molecule = Molecule(azulene, 'Azulene')
+	# Also create a molecule renderer...later
 
 	mag = 100
 	r_start, r_end = False, False
@@ -61,29 +61,14 @@ def main():
 				r_pos = None
 
 
-		# Prior to displaying, order atoms in molecule by z-position.
-		molecule.atoms.sort(key=lambda x: x.vector[0].item(2), reverse=False)
+		# Update molecule position, orientation etc.
+		molecule.reorder_atoms()
 
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
 
 		# Drawing the molecule.
-		# Drawing bonds.
-		for bond in molecule.bonds:
-			x1 = bond.atoms[0].vector[0,0]*mag+WIDTH//2
-			y1 = bond.atoms[0].vector[0,1]*mag+HEIGHT//2
-			x2 = bond.atoms[1].vector[0,0]*mag+WIDTH//2
-			y2 = bond.atoms[1].vector[0,1]*mag+HEIGHT//2
-			pg.draw.line(screen, (255,255,255), (x1, y1), (x2, y2), 5)
-		# Drawing atoms.
-		for atom in molecule.atoms:
-			x = atom.vector[0,0]*mag+WIDTH//2
-			y = atom.vector[0,1]*mag+HEIGHT//2
-			if atom.element == "H":
-				radius = (covalent_radii[atom.element]*mag*0.4) + (atom.vector[0].item(2))
-			else:
-				radius = (covalent_radii[atom.element]*mag*0.3) + (atom.vector[0].item(2))
-			pg.draw.circle(screen, atom_color[atom.element], (x, y), radius)
+		molecule.draw(screen, mag, WIDTH, HEIGHT)
 		
 		pg.display.update()
 		clock.tick(60)
