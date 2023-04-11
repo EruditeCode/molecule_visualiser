@@ -1,22 +1,24 @@
 import pygame as pg
 import math
 import numpy as np
-from molecules import methane, benzene, paracetamol, penicillin, azulene
 from geometric_functions import rotate_y, rotate_x, recenter_molecule
 from support_classes import Molecule, Molecule_Renderer
+from support_functions import get_molecule
 
 
 def main():
+	# Use terminal interface to make data request before creating visualisation window.
+	molecule_data = get_molecule()
+	
 	pg.init()
 	WIDTH, HEIGHT = 900, 600
 	screen = pg.display.set_mode((WIDTH, HEIGHT))
 	clock = pg.time.Clock()
-
 	bg = pg.Surface((WIDTH, HEIGHT))
 	bg.fill((130,150,150))
 
 	# Load molecule using molecule class.
-	molecule = Molecule(azulene, 'Azulene')
+	molecule = Molecule(molecule_data)
 	molecule_renderer = Molecule_Renderer(molecule, screen, WIDTH, HEIGHT)
 
 	# Flags and Placeholders
@@ -40,6 +42,13 @@ def main():
 					recenter_molecule(position, molecule)
 			if event.type == pg.MOUSEWHEEL:
 				molecule_renderer.mag += event.y
+			if event.type == pg.KEYUP:
+				if event.key == pg.K_b:
+					molecule_renderer.show_multiple_bonds = not molecule_renderer.show_multiple_bonds
+				if event.key == pg.K_h:
+					molecule_renderer.show_H = not molecule_renderer.show_H
+				if event.key == pg.K_r:
+					molecule_renderer.show_free_rotation = not molecule_renderer.show_free_rotation
 
 		# Update molecule position.
 		if r_start:
