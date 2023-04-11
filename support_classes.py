@@ -15,6 +15,14 @@ class Bond:
 	def __init__(self, atom_a, atom_b, bond_order):
 		self.atoms = [atom_a, atom_b]
 		self.order = bond_order
+		self.free = True
+
+	def check_if_rotatable(self, bonds):
+		# Not strictly true but useful initially. pretty rubbish...needs a fix
+		# Need to find anything that is bond.order 1 and not terminal e.g. to a hydrogen, fluorine, chlorine etc...
+		for bond in bonds:
+			if any(atom in self.atoms for atom in bond.atoms) and bond.order > 1:
+				self.free = False
 
 
 class Molecule:
@@ -26,13 +34,15 @@ class Molecule:
 		self.constructor(molecule)
 
 	def constructor(self, molecule):
-		# Log the id from source - PubChem.
+		# Log the id from source e.g. PubChem.
 		self.id = molecule['mol_id']
 		for atom in molecule['atoms']:
 			self.atoms.append(Atom(atom[0], atom[1], atom[2], atom[3], atom[4]))
 		for bond in molecule['bonds']:
 			atom_a, atom_b = self.find_bonding_atoms(bond[0], bond[1])
 			self.bonds.append(Bond(atom_a, atom_b, bond[2]))
+		for bond in self.bonds:
+			bond.check_if_rotatable(self.bonds)
 
 	def find_bonding_atoms(self, id_a, id_b):
 		for atom in self.atoms:
@@ -58,27 +68,78 @@ class Molecule_Renderer:
 		self.screen = screen
 		self.center = (width//2, height//2)
 
-		# Properties
+		# Properties and Settings
 		self.mag = 100
+		self.show_multiple_bonds = False
 		self.show_H = True
 		self.show_free_rotation = False
 
 	def draw(self):
 		# Have to draw any bonds connected to an atom before drawing the atom.
-		available_bonds = self.molecule.bonds.copy()
-		for atom in self.molecule.atoms:
-			for i in range(len(available_bonds)-1, -1, -1):
-				if atom in available_bonds[i].atoms:
-					self.draw_bond(available_bonds[i])
-					available_bonds.pop(i)
-			self.draw_atom(atom)
+		if self.show_H:
+			available_bonds = self.molecule.bonds.copy()
+			for atom in self.molecule.atoms:
+				for i in range(len(available_bonds)-1, -1, -1):
+					if atom in available_bonds[i].atoms:
+						self.draw_bond(available_bonds[i])
+						available_bonds.pop(i)
+				self.draw_atom(atom)
+		else:
+			available_bonds = [bond for bond in self.molecule.bonds if bond.atoms[0].element != "H" and bond.atoms[1].element != "H"]
+			for atom in self.molecule.atoms:
+				if atom.element != "H":
+					for i in range(len(available_bonds)-1, -1, -1):
+						if atom in available_bonds[i].atoms:
+							self.draw_bond(available_bonds[i])
+							available_bonds.pop(i)
+					self.draw_atom(atom)
 
 	def draw_bond(self, bond):
 		x1 = bond.atoms[0].vector[0,0]*self.mag+self.center[0]
 		y1 = bond.atoms[0].vector[0,1]*self.mag+self.center[1]
 		x2 = bond.atoms[1].vector[0,0]*self.mag+self.center[0]
 		y2 = bond.atoms[1].vector[0,1]*self.mag+self.center[1]
-		pg.draw.line(self.screen, (255,255,255), (x1, y1), (x2, y2), 5)
+		if bond.order > 1 and self.show_multiple_bonds:
+			if bond.order % 2 != 0:
+				pg.draw.line(self.screen, (255,255,255), (x1, y1), (x2, y2), 5)
+
+			bond_spread = bond.order * 5
+			r = bond_spread/2
+			# Huge messy section...needs tidying up...
+			# Line between atoms
+			m = (y2 - y1)/(x2 - x1)
+			if m != 0:
+				c = y1 - (m * x1)
+				# Line perpendicular at atom 1...
+				m_perp = (-1/m)
+				c_perp = y1 - m_perp*x1
+				# Need to find two points
+				a = 1 + m_perp**2
+				b = 2*m_perp*c_perp - 2*x1 - 2*y1*m_perp
+				c = c_perp**2 + x1**2 + y1**2 - r**2 - 2*y1*c_perp
+				x1_perp_1 = (-b + ((b**2)-4*a*c)**0.5)/(2*a)
+				y1_perp_1 = m_perp*x1_perp_1 + c_perp
+				x1_perp_2 = (-b - ((b**2)-4*a*c)**0.5)/(2*a)
+				y1_perp_2 = m_perp*x1_perp_2 + c_perp
+
+				c_perp = y2 - m_perp*x2
+				# Need to find two points
+				a = 1 + m_perp**2
+				b = 2*m_perp*c_perp - 2*x2 - 2*y2*m_perp
+				c = c_perp**2 + x2**2 + y2**2 - r**2 - 2*y2*c_perp
+				x2_perp_1 = (-b + ((b**2)-4*a*c)**0.5)/(2*a)
+				y2_perp_1 = m_perp*x2_perp_1 + c_perp
+				x2_perp_2 = (-b - ((b**2)-4*a*c)**0.5)/(2*a)
+				y2_perp_2 = m_perp*x2_perp_2 + c_perp
+
+				pg.draw.line(self.screen, (255,255,255), (x1_perp_1, y1_perp_1), (x2_perp_1, y2_perp_1), 5)
+				pg.draw.line(self.screen, (255,255,255), (x1_perp_2, y1_perp_2), (x2_perp_2, y2_perp_2), 5)
+
+		else:
+			if self.show_free_rotation and bond.free:
+				pg.draw.line(self.screen, (255,0,0), (x1, y1), (x2, y2), 5)
+			else:
+				pg.draw.line(self.screen, (255,255,255), (x1, y1), (x2, y2), 5)
 
 	def draw_atom(self, atom):
 		x = atom.vector[0,0]*self.mag+self.center[0]
