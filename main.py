@@ -3,7 +3,7 @@ import math
 import numpy as np
 from molecules import methane, benzene, paracetamol, penicillin, azulene
 from geometric_functions import rotate_y, rotate_x, recenter_molecule
-from support_classes import Molecule
+from support_classes import Molecule, Molecule_Renderer
 
 
 def main():
@@ -17,11 +17,15 @@ def main():
 
 	# Load molecule using molecule class.
 	molecule = Molecule(azulene, 'Azulene')
-	# Also create a molecule renderer...later
+	molecule_renderer = Molecule_Renderer(molecule, screen, WIDTH, HEIGHT)
 
-	mag = 100
+	# Settings
+	mag = 100 # Should incorporate this into the renderer...
+
+	# Flags and Placeholders
 	r_start, r_end = False, False
 	r_pos = None
+	
 	while True:
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -67,8 +71,8 @@ def main():
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
 
-		# Drawing the molecule.
-		molecule.draw(screen, mag, WIDTH, HEIGHT)
+		# Drawing the molecule using the molecule renderer.
+		molecule_renderer.draw(mag)
 		
 		pg.display.update()
 		clock.tick(60)
