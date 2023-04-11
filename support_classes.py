@@ -63,26 +63,26 @@ class Molecule_Renderer:
 		self.show_H = True
 		self.show_free_rotation = False
 
-	def draw(self, magnification):
+	def draw(self):
 		# Have to draw any bonds connected to an atom before drawing the atom.
 		available_bonds = self.molecule.bonds.copy()
 		for atom in self.molecule.atoms:
 			for i in range(len(available_bonds)-1, -1, -1):
 				if atom in available_bonds[i].atoms:
-					self.draw_bond(available_bonds[i], magnification)
+					self.draw_bond(available_bonds[i])
 					available_bonds.pop(i)
-			self.draw_atom(atom, magnification)
+			self.draw_atom(atom)
 
-	def draw_bond(self, bond, magnification):
-		x1 = bond.atoms[0].vector[0,0]*magnification+self.center[0]
-		y1 = bond.atoms[0].vector[0,1]*magnification+self.center[1]
-		x2 = bond.atoms[1].vector[0,0]*magnification+self.center[0]
-		y2 = bond.atoms[1].vector[0,1]*magnification+self.center[1]
+	def draw_bond(self, bond):
+		x1 = bond.atoms[0].vector[0,0]*self.mag+self.center[0]
+		y1 = bond.atoms[0].vector[0,1]*self.mag+self.center[1]
+		x2 = bond.atoms[1].vector[0,0]*self.mag+self.center[0]
+		y2 = bond.atoms[1].vector[0,1]*self.mag+self.center[1]
 		pg.draw.line(self.screen, (255,255,255), (x1, y1), (x2, y2), 5)
 
-	def draw_atom(self, atom, magnification):
-		x = atom.vector[0,0]*magnification+self.center[0]
-		y = atom.vector[0,1]*magnification+self.center[1]
+	def draw_atom(self, atom):
+		x = atom.vector[0,0]*self.mag+self.center[0]
+		y = atom.vector[0,1]*self.mag+self.center[1]
 		num = 0.4 if (atom.element == "H") else 0.3
-		radius = (covalent_radii[atom.element]*magnification*num) + atom.vector[0,2]
+		radius = (covalent_radii[atom.element]*self.mag*num) + atom.vector[0,2]
 		pg.draw.circle(self.screen, atom_color[atom.element], (x, y), radius)

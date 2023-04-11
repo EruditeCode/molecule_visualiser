@@ -19,9 +19,6 @@ def main():
 	molecule = Molecule(azulene, 'Azulene')
 	molecule_renderer = Molecule_Renderer(molecule, screen, WIDTH, HEIGHT)
 
-	# Settings
-	mag = 100 # Should incorporate this into the renderer...
-
 	# Flags and Placeholders
 	r_start, r_end = False, False
 	r_pos = None
@@ -39,10 +36,10 @@ def main():
 					r_end = True
 				if event.button == 3:
 					position = pg.mouse.get_pos()
-					position = ((position[0]-WIDTH//2)/mag, (position[1]-HEIGHT//2)/mag)
+					position = ((position[0]-WIDTH//2)/molecule_renderer.mag, (position[1]-HEIGHT//2)/molecule_renderer.mag)
 					recenter_molecule(position, molecule)
 			if event.type == pg.MOUSEWHEEL:
-				mag += event.y
+				molecule_renderer.mag += event.y
 
 		# Update molecule position.
 		if r_start:
@@ -72,7 +69,7 @@ def main():
 		screen.blit(bg, (0, 0))
 
 		# Drawing the molecule using the molecule renderer.
-		molecule_renderer.draw(mag)
+		molecule_renderer.draw()
 		
 		pg.display.update()
 		clock.tick(60)
