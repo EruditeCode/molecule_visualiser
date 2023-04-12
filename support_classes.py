@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pygame as pg
 from atom_properties import covalent_radii, atom_color
@@ -18,8 +19,7 @@ class Bond:
 		self.free = True
 
 	def check_if_rotatable(self, bonds):
-		# Not strictly true but useful initially. pretty rubbish...needs a fix
-		# Need to find anything that is bond.order 1 and not terminal e.g. to a hydrogen, fluorine, chlorine etc...
+		# NOT AN ACCURATE OR VIABLE CHECK AT PRESENT - CONSIDERATION REQUIRED!
 		for bond in bonds:
 			if any(atom in self.atoms for atom in bond.atoms) and bond.order > 1:
 				self.free = False
@@ -32,6 +32,7 @@ class Molecule:
 		self.atoms = []
 		self.bonds = []
 		self.constructor(molecule)
+		self.spin = False
 
 	def constructor(self, molecule):
 		for atom in molecule['atoms']:

@@ -1,3 +1,7 @@
+"""
+Useful notes: unit for atomic vector dimensions is Angstrom.
+"""
+
 import pygame as pg
 import math
 from geometric_functions import rotate_y, rotate_x, recenter_molecule
@@ -48,6 +52,8 @@ def main():
 					molecule_renderer.show_H = not molecule_renderer.show_H
 				if event.key == pg.K_r:
 					molecule_renderer.show_free_rotation = not molecule_renderer.show_free_rotation
+				if event.key == pg.K_s:
+					molecule.spin = not molecule.spin
 
 		# Update molecule position.
 		if r_start:
@@ -68,6 +74,10 @@ def main():
 					atom.fixed_vector = atom.vector.copy()
 				r_start, r_end = False, False
 				r_pos = None
+
+		if molecule.spin:
+			for atom in molecule.atoms:
+				atom.vector = rotate_y(0.01, atom.vector)
 
 		# Displaying the background surface.
 		screen.blit(bg, (0, 0))
