@@ -98,7 +98,7 @@ class Molecule_Renderer:
 
 			bond_spread = bond.order * 5
 			r = bond_spread/2
-			# Huge messy section...needs tidying up...
+			# HUGE MESSY SECTION - NEEDS TIDYING UP!
 			# Line between atoms
 			m = (y2 - y1)/(x2 - x1)
 			if m != 0:

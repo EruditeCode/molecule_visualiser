@@ -1,5 +1,10 @@
 """
+A program to visualise (and import) molecule structures
+from both a local and remote (PubChem) database.
+
 Useful notes: unit for atomic vector dimensions is Angstrom.
+
+Link to Video: https://youtu.be/vU67TS1j31Q
 """
 
 import pygame as pg
